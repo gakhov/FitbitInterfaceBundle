@@ -5,7 +5,7 @@
  */
 namespace Nibynool\FitbitInterfaceBundle\Fitbit;
 
-use OAuth\OAuth1\Token\TokenInterface;
+use OAuth\OAuth2\Token\TokenInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Nibynool\FitbitInterfaceBundle\Fitbit\Exception as FBException;
 
@@ -40,6 +40,32 @@ class AuthenticationGateway extends EndpointGateway
     }
 
     /**
+     * Determine if access token is expired and refresh it
+     *
+     * @access public
+     * @version 0.0.1
+     *
+     * @throws FBException
+     * @return bool
+     */
+    public function refreshTokenIfRequired()
+    {
+        try
+        {
+            $accessToken = $this->service->getStorage()->retrieveAccessToken('FitBit');
+            if ($accessToken->isExpired() !== TRUE) {
+                return FALSE;
+            }
+            $this->service->refreshAccessToken($accessToken);
+            return TRUE;
+        }
+        catch (\Exception $e)
+        {
+            throw new FitBitException('Could not refresh the access token.', 202, $e);
+        }
+    }
+
+    /**
      * Initiate the login process
      *
      * @access public
@@ -50,11 +76,9 @@ class AuthenticationGateway extends EndpointGateway
      */
     public function initiateLogin()
     {
-	    /** @var TokenInterface $token */
-        $token = $this->service->requestRequestToken();
-        $url = $this->service->getAuthorizationUri(array('oauth_token' => $token->getRequestToken()));
-	    if (!filter_var($url, FILTER_VALIDATE_URL)) throw new FBException('Fitbit returned an invalid login URL ('.$url.').', 201);
-	    header('Location: ' . $url);
+        $url = $this->service->getAuthorizationUri();
+        if (!filter_var($url, FILTER_VALIDATE_URL)) throw new FitBitException('FitBit returned an invalid login URL ('.$url.').', 201);
+        header('Location: ' . $url);
         exit;
     }
     
@@ -69,39 +93,27 @@ class AuthenticationGateway extends EndpointGateway
      * @throws FBException
      * @return TokenInterface
      */
-    public function authenticateUser($token, $verifier)
+
+    public function authenticateUser($code)
     {
-	    /** @var Stopwatch $timer */
-	    $timer = new Stopwatch();
-	    $timer->start('Authenticating User', 'Fitbit API');
+        /** @var Stopwatch $timer */
+        $timer = new Stopwatch();
+        $timer->start('Authenticating User', 'FitBit API');
 
-	    try
-	    {
-		    /** @var TokenInterface $tokenSecret */
-	        $tokenSecret = $this->service->getStorage()->retrieveAccessToken('FitBit');
-	    }
-	    catch (\Exception $e)
-	    {
-		    $timer->stop('Authenticating User');
-		    throw new FBException('Could not retrieve the access token secret.', 202, $e);
-	    }
-
-	    try
-	    {
-		    /** @var TokenInterface $tokenResponse */
-	        $tokenResponse = $this->service->requestAccessToken(
-                $token,
-                $verifier,
-                $tokenSecret->getRequestTokenSecret()
-	        );
-		    $timer->stop('Authenticating User');
-		    return $tokenResponse;
-	    }
-	    catch (\Exception $e)
-	    {
-		    $timer->stop('Authenticating User');
-		    throw new FBException('Unable to request the access token.', 203, $e);
-	    }
+        try
+        {
+            /** @var TokenInterface $tokenResponse */
+            $tokenResponse = $this->service->requestAccessToken(
+                $code
+            );
+            $timer->stop('Authenticating User');
+            return $tokenResponse;
+        }
+        catch (\Exception $e)
+        {
+            $timer->stop('Authenticating User');
+            throw new FBException('Unable to request the access token.', 203, $e);
+        }
     }
 
     /**

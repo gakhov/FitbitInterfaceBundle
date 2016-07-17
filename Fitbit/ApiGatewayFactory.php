@@ -7,7 +7,7 @@ namespace Nibynool\FitbitInterfaceBundle\Fitbit;
 
 use OAuth\Common\Consumer\Credentials;
 use OAuth\ServiceFactory;
-use OAuth\OAuth1\Service\Fitbit as ServiceInterface;
+use OAuth\OAuth2\Service\FitBit as ServiceInterface;
 use OAuth\Common\Storage\TokenStorageInterface;
 use OAuth\Common\Http\Client\ClientInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -69,6 +69,10 @@ class ApiGatewayFactory
      */
     protected $callbackURL;
     /**
+     * @var array
+     */
+    protected $scopes;
+    /**
      * @var ClientInterface
      */
     protected $httpClient;
@@ -92,13 +96,14 @@ class ApiGatewayFactory
 	 * @param array  $configuration Configurable items
 	 * @param Router $router
 	 */
-	public function __construct($consumer_key, $consumer_secret, $callback_url, $configuration, Router $router)
+	public function __construct($consumer_key, $consumer_secret, $callback_url, array $scopes, $configuration, Router $router)
 	{
 		$this->consumerKey    = $consumer_key;
 		$this->consumerSecret = $consumer_secret;
 		$this->callbackURL    = $callback_url;
 		$this->configuration  = $configuration;
 		$this->router         = $router;
+        $this->scopes         = $scopes;
 	}
 
 	/**
@@ -299,7 +304,7 @@ class ApiGatewayFactory
 	        {
 	            $factory = new ServiceFactory();
 		        if ($this->httpClient) $factory->setHttpClient($this->httpClient);
-		        $this->service = $factory->createService('FitBit', $credentials, $this->storageAdapter);
+		        $this->service = $factory->createService('FitBit', $credentials, $this->storageAdapter, $this->scopes);
 	        }
 	        catch (\Exception $e)
 	        {

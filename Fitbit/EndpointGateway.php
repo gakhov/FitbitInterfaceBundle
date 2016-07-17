@@ -6,7 +6,7 @@
 namespace Nibynool\FitbitInterfaceBundle\Fitbit;
 
 use SimpleXMLElement;
-use OAuth\OAuth1\Service\Fitbit as ServiceInterface;
+use OAuth\OAuth2\Service\Fitbit as ServiceInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Nibynool\FitbitInterfaceBundle\Fitbit\Exception as FBException;
 
@@ -31,6 +31,7 @@ class EndpointGateway
      * @var string
      */
     protected $userID;
+
 	/** @var array $configuration */
 	protected $configuration;
 

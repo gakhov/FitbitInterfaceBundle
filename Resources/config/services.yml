@@ -2,6 +2,7 @@ parameters:
     nibynool_fitbit_interface.key: ''
     nibynool_fitbit_interface.secret: ''
     nibynool_fitbit_interface.callback: ''
+    nibynool_fitbit_interface.scopes: []
     nibynool_fitbit_interface.configuration: []
 services:
     nibynool.fitbit.interface:
@@ -10,5 +11,6 @@ services:
             - %nibynool_fitbit_interface.key%
             - %nibynool_fitbit_interface.secret%
             - %nibynool_fitbit_interface.callback%
+            - %nibynool_fitbit_interface.scopes%
             - %nibynool_fitbit_interface.configuration%
             - @router
