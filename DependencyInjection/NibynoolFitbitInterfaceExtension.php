@@ -19,12 +19,12 @@ class NibynoolFitbitInterfaceExtension extends Extension
 		$container->setParameter('nibynool_fitbit_interface.key',      $config['key']);
 		$container->setParameter('nibynool_fitbit_interface.secret',   $config['secret']);
 		$container->setParameter('nibynool_fitbit_interface.callback', $config['callback']);
+                $container->setParameter('nibynool_fitbit_interface.scopes',   $config['scopes']);
 		$container->setParameter(
 			'nibynool_fitbit_interface.configuration',
 			array(
 				'distance_units'                => $config['distance_units'],
 				'interday_timeseries_endpoints' => $config['interday_timeseries_endpoints'],
-				'intraday_timeseries_endpoints' => $config['intraday_timeseries_endpoints'],
 				'subscription_types'            => $config['subscription_types'],
 				'water_units'                   => $config['water_units']
 			)
