@@ -37,7 +37,7 @@ class TokenStorage
      * @param string $storage The storage to use for the token
      * @param string $token  The token to be added to the storage if this is pre-authorised
      * @param string $secret The secret associated with the token.
-     * @throws FitBitException
+     * @throws FBException
      */
     public function __construct($storage = 'memory', $accessToken = null, $lifetime = null, $refreshToken = null)
     {

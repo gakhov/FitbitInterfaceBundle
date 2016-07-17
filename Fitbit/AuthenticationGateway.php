@@ -61,7 +61,7 @@ class AuthenticationGateway extends EndpointGateway
         }
         catch (\Exception $e)
         {
-            throw new FitBitException('Could not refresh the access token.', 202, $e);
+            throw new FBException('Could not refresh the access token.', 202, $e);
         }
     }
 
@@ -77,7 +77,7 @@ class AuthenticationGateway extends EndpointGateway
     public function initiateLogin()
     {
         $url = $this->service->getAuthorizationUri();
-        if (!filter_var($url, FILTER_VALIDATE_URL)) throw new FitBitException('FitBit returned an invalid login URL ('.$url.').', 201);
+        if (!filter_var($url, FILTER_VALIDATE_URL)) throw new FBException('FitBit returned an invalid login URL ('.$url.').', 201);
         header('Location: ' . $url);
         exit;
     }
